@@ -9,7 +9,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views import generic
 from requests import get as get_data
-
+import os
 from . import forms
 from .tokens import account_activation_token
 
@@ -30,13 +30,13 @@ class Home(LoginRequiredMixin, generic.TemplateView):
         form = forms.IPForm(request.POST)
         if form.is_valid():
             ip_address = request.POST.get('IP_address')
-            token = '2209e401d4674f'
+            token = os.getenv('API_TOKEN_1')
             url = f"https://ipinfo.io/{ip_address}?token={token}"
             if 'loc' in get_data(url).json().keys():
                 IP_Loc = get_data(url).json()['loc']
                 context['Longitude'] = IP_Loc.split(',')[0]
                 context['Latitude'] = IP_Loc.split(',')[1]
-                access_key = '83514ac3e4b6438ab0ba0aa94630d939'
+                access_key = os.getenv('API_TOKEN_2')
                 url_2 = f'http://api.positionstack.com/v1/reverse?access_key={access_key}&query={IP_Loc}'
                 context['address'] = get_data(url_2).json()['data'][0]['label']
             else:
